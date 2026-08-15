@@ -1,0 +1,37 @@
+{
+  "name": "peertube-plugin-auth-openid-connect-google",
+  "version": "1.2.0",
+  "description": "Add OpenID connect support to login form in PeerTube.",
+  "licence": "AGPL-3.0-only",
+  "engine": {
+    "peertube": ">=2.2.0"
+  },
+  "keywords": [
+    "peertube",
+    "plugin",
+    "auth"
+  ],
+  "scripts": {
+    "tsc": "tsc",
+    "build": "npm run tsc",
+    "prepublishOnly": "npm run build"
+  },
+  "homepage": "https://framagit.org/framasoft/peertube/official-plugins/tree/master/peertube-plugin-auth-openid-connect",
+  "author": "Chocobozzz",
+  "bugs": "https://framagit.org/framasoft/peertube/official-plugins/issues",
+  "library": "./dist/main.js",
+  "staticDirs": {},
+  "css": [],
+  "clientScripts": [],
+  "translations": {},
+  "dependencies": {
+    "openid-client": "^6.6.3"
+  },
+  "devDependencies": {
+    "@peertube/peertube-types": "^7.2.3",
+    "@types/express": "^5.0.3",
+    "@types/node": "^24.2.1",
+    "oxlint": "^1.11.0",
+    "typescript": "^5.9.2"
+  }
+}

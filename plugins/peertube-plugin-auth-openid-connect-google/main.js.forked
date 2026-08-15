@@ -1,0 +1,489 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.claimReader = claimReader;
+const openid = require("openid-client");
+const crypto = require("crypto");
+// Read a property from UserInfo, falling back to the ID token claims.
+function claimReader(userInfo, claims) {
+    return (key) => key ? (userInfo?.[key] ?? claims?.[key]) : undefined;
+}
+const store = {
+    config: null,
+    userAuthenticated: null,
+    secretKey: null,
+    redirectUrl: null,
+    authDisplayName: 'OpenID Connect'
+};
+const encryptionOptions = {
+    algorithm: 'aes-256-gcm',
+    inputEncoding: 'utf-8',
+    outputEncoding: 'hex'
+};
+const cookieBaseOptions = {
+    secure: true,
+    httpOnly: true,
+    sameSite: 'none'
+};
+const cookieCreateOptions = { ...cookieBaseOptions, maxAge: 1000 * 60 * 10 /* 10 minutes*/ };
+const cookieNamePrefix = 'plugin-auth-openid-';
+async function register({ registerExternalAuth, unregisterExternalAuth, registerSetting, settingsManager, peertubeHelpers, getRouter }) {
+    const { logger } = peertubeHelpers;
+    registerSetting({
+        name: 'auth-display-name',
+        label: 'Auth display name',
+        type: 'input',
+        private: true,
+        default: 'OpenID Connect'
+    });
+    registerSetting({
+        name: 'discover-url',
+        label: 'Discover URL',
+        type: 'input',
+        private: true
+    });
+    registerSetting({
+        name: 'client-id',
+        label: 'Client ID',
+        type: 'input',
+        private: true
+    });
+    registerSetting({
+        name: 'client-secret',
+        label: 'Client secret',
+        type: 'input',
+        private: true
+    });
+    registerSetting({
+        name: 'scope',
+        label: 'Scope',
+        type: 'input',
+        private: true,
+        default: 'openid email profile'
+    });
+    registerSetting({
+        name: 'username-property',
+        label: 'Username property',
+        type: 'input',
+        private: true,
+        default: 'preferred_username'
+    });
+    registerSetting({
+        name: 'mail-property',
+        label: 'Email property',
+        type: 'input',
+        private: true,
+        default: 'email'
+    });
+    registerSetting({
+        name: 'logout-redirect-uri',
+        label: 'Logout redirect URI',
+        type: 'input',
+        private: true,
+        descriptionHTML: 'Custom query parameters for logout redirect.<br/>For AWS Cognito, use <code>logout_uri</code> instead of <code>post_logout_redirect_uri</code>.<br/>Example: <code>post_logout_redirect_uri=https://your-instance.example.com</code>'
+    });
+    registerSetting({
+        name: 'allowed-external-redirect-uris',
+        label: 'Allowed external redirect URIs',
+        type: 'input',
+        private: true,
+        descriptionHTML: 'Comma-separated list of URIs that are allowed to appear as the externalRedirectUri.<br/>Items starting with a <code>~</code> are parsed as regexp, all other entries must be exact matches, including the protocol.<br/>Example: <code>https://my-frontend.com/exact-path,~^https://trusted\\.com/any/subpath/allowed/.*$</code>',
+        default: '~^peertube://joinpeertube.org/.*$'
+    });
+    registerSetting({
+        name: 'display-name-property',
+        label: 'Display name property',
+        type: 'input',
+        private: true
+    });
+    registerSetting({
+        name: 'role-property',
+        label: 'Role property',
+        type: 'input',
+        private: true
+    });
+    registerSetting({
+        name: 'group-property',
+        label: 'Group property',
+        type: 'input',
+        private: true,
+        descriptionHTML: 'Property/claim that contains user groups (array)'
+    });
+    registerSetting({
+        name: 'allowed-group',
+        label: 'Allowed group',
+        type: 'input',
+        private: true,
+        descriptionHTML: 'Will only allow login for users whose group array contains this group'
+    });
+    registerSetting({
+        name: 'signature-algorithm',
+        label: 'Token signature algorithm',
+        type: 'input',
+        private: true,
+        default: 'RS256'
+    });
+    const router = getRouter();
+    router.use('/code-cb', (req, res) => handleCb(peertubeHelpers, settingsManager, req, res));
+    store.redirectUrl = peertubeHelpers.config.getWebserverUrl() + '/plugins/auth-openid-connect-google/router/code-cb';
+    store.secretKey = await getRandomBytes(32);
+    settingsManager.onSettingsChange((settings) => {
+        loadSettingsAndCreateClient(registerExternalAuth, unregisterExternalAuth, peertubeHelpers, settingsManager)
+            .catch(err => logger.error('Cannot load settings and create client after settings changes.', { err }));
+        if (settings['auth-display-name'])
+            store.authDisplayName = settings['auth-display-name'];
+        return Promise.resolve();
+    });
+    try {
+        await loadSettingsAndCreateClient(registerExternalAuth, unregisterExternalAuth, peertubeHelpers, settingsManager);
+    }
+    catch (err) {
+        logger.error('Cannot load settings and create open id client.', { err });
+    }
+    store.authDisplayName = await settingsManager.getSetting('auth-display-name');
+}
+async function unregister() {
+    return;
+}
+module.exports = {
+    register,
+    unregister
+};
+// ############################################################################
+async function loadSettingsAndCreateClient(registerExternalAuth, unregisterExternalAuth, peertubeHelpers, settingsManager) {
+    const { logger } = peertubeHelpers;
+    if (store.config) {
+        unregisterExternalAuth('openid-connect-google');
+    }
+    store.config = null;
+    store.userAuthenticated = null;
+    const settings = await settingsManager.getSettings([
+        'scope',
+        'discover-url',
+        'client-id',
+        'client-secret',
+        'logout-redirect-uri',
+        'allowed-external-redirect-uris',
+        'signature-algorithm'
+    ]);
+    if (!settings['discover-url']) {
+        logger.info('Do not register external openid auth because discover URL is not set.');
+        return;
+    }
+    if (!settings['client-id']) {
+        logger.info('Do not register external openid auth because client ID is not set.');
+        return;
+    }
+    let discoverUrl;
+    try {
+        discoverUrl = new URL(settings['discover-url']);
+    }
+    catch (err) {
+        logger.error('Cannot parse discover URL.', { err, discoverUrl: settings['discover-url'] });
+        return;
+    }
+    // Helper function to create client from issuer
+    async function discover() {
+        const options = {
+            response_types: ['code'],
+            client_id: settings['client-id'],
+            id_token_signed_response_alg: settings['signature-algorithm'],
+            authorization_signed_response_alg: settings['signature-algorithm']
+        };
+        if (settings['client-secret']) {
+            options.client_secret = settings['client-secret'];
+        }
+        else {
+            options.token_endpoint_auth_method = 'none';
+        }
+        const discoverInsecureConfig = process.env.NODE_ENV === 'test' || process.env.NODE_ENV === 'dev'
+            ? {
+                execute: [openid.allowInsecureRequests]
+            }
+            : undefined;
+        const config = await openid.discovery(discoverUrl, settings['client-id'], options, undefined, discoverInsecureConfig);
+        return config;
+    }
+    // Try initial discovery
+    try {
+        store.config = await discover();
+        logger.debug('Discovered issuer %s.', discoverUrl);
+    }
+    catch (err) {
+        logger.warn('Initial OpenID discovery failed - will retry on first auth attempt', { err });
+        // Continue to register auth method even if discovery failed
+    }
+    // Always register the auth method
+    const result = registerExternalAuth({
+        authName: 'openid-connect-google',
+        authDisplayName: () => store.authDisplayName,
+        onAuthRequest: async (req, res) => {
+            try {
+                // If client doesn't exist, try to create it now
+                if (!store.config) {
+                    store.config = await discover();
+                    logger.debug('Discovered issuer %s.', discoverUrl);
+                }
+                // Now proceed with normal auth flow using the cached client
+                const codeVerifier = openid.randomPKCECodeVerifier();
+                const codeChallenge = await openid.calculatePKCECodeChallenge(codeVerifier);
+                const params = {
+                    scope: settings['scope'],
+                    redirect_uri: store.redirectUrl,
+                    response_mode: 'form_post',
+                    code_challenge: codeChallenge,
+                    code_challenge_method: 'S256',
+                    state: openid.randomState()
+                };
+                if (!store.config.serverMetadata().supportsPKCE()) {
+                    params.nonce = openid.randomNonce();
+                }
+                const redirectUrl = openid.buildAuthorizationUrl(store.config, params);
+                const encryptedCodeVerifier = await encrypt(codeVerifier);
+                res.cookie(cookieNamePrefix + 'code-verifier', encryptedCodeVerifier, cookieCreateOptions);
+                const encryptedState = await encrypt(params.state);
+                res.cookie(cookieNamePrefix + 'state', encryptedState, cookieCreateOptions);
+                if (params.nonce) {
+                    const encryptedNonce = await encrypt(params.nonce);
+                    res.cookie(cookieNamePrefix + 'nonce', encryptedNonce, cookieCreateOptions);
+                }
+                // If an external redirect URL is provided, this is where the user
+                // should be redirected after they logged in, instead of /login.
+                const externalRedirectUri = req.query.externalRedirectUri;
+                if (typeof externalRedirectUri === 'string') {
+                    const allowedUrisSetting = settings['allowed-external-redirect-uris'];
+                    if (matchesUriInList(externalRedirectUri, allowedUrisSetting, logger)) {
+                        const encryptedExternalRedirectUri = await encrypt(externalRedirectUri);
+                        res.cookie(cookieNamePrefix + 'external-redirect-url', encryptedExternalRedirectUri, cookieCreateOptions);
+                    }
+                    else {
+                        logger.warn('The externalRedirectUri is not allowed', { externalRedirectUri, allowedUrisSetting });
+                        res.clearCookie(cookieNamePrefix + 'external-redirect-url', cookieBaseOptions);
+                        return res.status(403).json({ error: 'The externalRedirectUri is not allowed by the administrator' });
+                    }
+                }
+                else {
+                    res.clearCookie(cookieNamePrefix + 'external-redirect-url', cookieBaseOptions);
+                }
+                return res.redirect(redirectUrl);
+            }
+            catch (err) {
+                logger.error('Cannot handle auth request - OpenID provider unavailable.', { err });
+                return res.redirect('/login');
+            }
+        },
+        onLogout: (_user, _req) => {
+            try {
+                if (!store.config)
+                    return Promise.resolve();
+                const logoutRedirectUri = settings['logout-redirect-uri'] || '';
+                const logoutParams = Object.fromEntries(new URLSearchParams(logoutRedirectUri).entries());
+                const logoutUrl = openid.buildEndSessionUrl(store.config, logoutParams).href;
+                logger.debug(`Redirecting to logout: ${logoutUrl}`);
+                return Promise.resolve(logoutUrl);
+            }
+            catch (err) {
+                logger.error('Cannot create logout request url - OpenID provider unavailable.', { err });
+                return Promise.resolve();
+            }
+        }
+    });
+    store.userAuthenticated = result.userAuthenticated;
+}
+async function handleCb(peertubeHelpers, settingsManager, req, res) {
+    const { logger } = peertubeHelpers;
+    if (!store.userAuthenticated) {
+        logger.info('Received callback but cannot userAuthenticated function does not exist.');
+        return onCBError(res);
+    }
+    const encryptedCodeVerifier = req.cookies[cookieNamePrefix + 'code-verifier'];
+    const encryptedState = req.cookies[cookieNamePrefix + 'state'];
+    if (!encryptedCodeVerifier || !encryptedState) {
+        logger.error('Received callback but code verifier or state not found in request cookies.');
+        return onCBError(res);
+    }
+    const encryptedNonce = req.cookies[cookieNamePrefix + 'nonce'];
+    const encryptedExternalRedirectUri = req.cookies[cookieNamePrefix + 'external-redirect-url'];
+    try {
+        const codeVerifier = await decrypt(encryptedCodeVerifier);
+        const state = await decrypt(encryptedState);
+        let nonce;
+        if (encryptedNonce)
+            nonce = await decrypt(encryptedNonce);
+        let externalRedirectUri;
+        if (encryptedExternalRedirectUri)
+            externalRedirectUri = await decrypt(encryptedExternalRedirectUri);
+        const tokenSet = await openid.authorizationCodeGrant(store.config, toRequest(peertubeHelpers, req), {
+            pkceCodeVerifier: codeVerifier,
+            expectedNonce: nonce,
+            expectedState: state,
+            idTokenExpected: true
+        });
+        const accessToken = tokenSet.access_token;
+        const claims = tokenSet.claims();
+        const userInfo = await openid.fetchUserInfo(store.config, accessToken, claims.sub);
+        const readClaim = claimReader(userInfo, claims);
+        const settings = await settingsManager.getSettings([
+            'mail-property',
+            'username-property',
+            'display-name-property',
+            'role-property',
+            'group-property',
+            'allowed-group'
+        ]);
+        logger.debug('Got user information from openid auth.', {
+            userInfoKeys: Object.keys(userInfo || {}),
+            claimsKeys: Object.keys(claims || {}),
+            configuredProperties: {
+                mail: settings['mail-property'],
+                username: settings['username-property'],
+                displayName: settings['display-name-property'],
+                role: settings['role-property'],
+                group: settings['group-property']
+            }
+        });
+        let role;
+        if (settings['role-property']) {
+            let roleToParse = userInfo[settings['role-property']];
+            if (Array.isArray(roleToParse))
+                roleToParse = roleToParse[0];
+            role = parseInt('' + roleToParse, 10);
+            if (isNaN(role)) {
+                logger.error('Cannot load role ' + roleToParse + ' from OpenID: not a number.');
+                role = null;
+            }
+        }
+        if (settings['group-property'] && settings['allowed-group']) {
+            const groupKey = settings['group-property'];
+            const groups = [userInfo?.[groupKey], claims?.[groupKey]].find(Array.isArray);
+            if (!Array.isArray(groups) || groups.length === 0) {
+                logger.debug('Cannot load groups from OpenID: not an array.', { groups });
+                return onCBError(res);
+            }
+            if (!groups.includes(settings['allowed-group'])) {
+                logger.debug('User is not in allowed group', { groups });
+                return onCBError(res);
+            }
+        }
+        let displayName;
+        if (settings['display-name-property']) {
+            displayName = readClaim(settings['display-name-property']);
+        }
+        const rawUsername = readClaim(settings['username-property']);
+        if (!rawUsername) {
+            logger.error('Cannot load username from OpenID: claim "' + settings['username-property'] + '" not found in UserInfo or ID token.');
+            return onCBError(res);
+        }
+        const username = rawUsername.toLowerCase().replace(/[^a-z0-9._]/g, '_');
+        res.clearCookie(cookieNamePrefix + 'external-redirect-url', cookieBaseOptions);
+        res.clearCookie(cookieNamePrefix + 'nonce', cookieBaseOptions);
+        res.clearCookie(cookieNamePrefix + 'code-verifier', cookieBaseOptions);
+        res.clearCookie(cookieNamePrefix + 'state', cookieBaseOptions);
+        store.userAuthenticated({
+            res,
+            req,
+            username,
+            email: readClaim(settings['mail-property']),
+            displayName,
+            role,
+            externalRedirectUri
+        } /* Remove cast when PeerTube types are updated to 7.3 */);
+    }
+    catch (err) {
+        logger.error('Error in handle callback.', {
+            errName: err?.name,
+            errMessage: err?.message
+        });
+        onCBError(res);
+    }
+}
+function onCBError(res) {
+    res.redirect('/login?externalAuthError=true');
+}
+async function encrypt(data) {
+    const { algorithm, inputEncoding, outputEncoding } = encryptionOptions;
+    const iv = await getRandomBytes(16);
+    const cipher = crypto.createCipheriv(algorithm, store.secretKey, iv);
+    let encrypted = cipher.update(data, inputEncoding, outputEncoding);
+    encrypted += cipher.final(outputEncoding);
+    const authTag = cipher.getAuthTag();
+    return iv.toString(outputEncoding) + ':' + encrypted + ':' + authTag.toString(outputEncoding);
+}
+async function decrypt(data) {
+    const { algorithm, inputEncoding, outputEncoding } = encryptionOptions;
+    const encryptedArray = data.split(':');
+    if (encryptedArray.length !== 3) {
+        throw new Error('Malformed encrypted payload');
+    }
+    const iv = Buffer.from(encryptedArray[0], outputEncoding);
+    const encrypted = Buffer.from(encryptedArray[1], outputEncoding);
+    const authTag = Buffer.from(encryptedArray[2], outputEncoding);
+    const decipher = crypto.createDecipheriv(algorithm, store.secretKey, iv);
+    decipher.setAuthTag(authTag);
+    return decipher.update(encrypted, undefined, inputEncoding) + decipher.final(inputEncoding);
+}
+function getRandomBytes(size) {
+    return new Promise((res, rej) => {
+        crypto.randomBytes(size, (err, buf) => {
+            if (err)
+                return rej(err);
+            return res(buf);
+        });
+    });
+}
+// Parse a comma-separated list of URIs, where each list item can be a regexp
+// pattern if it starts with a `~` and must be an exact match otherwise.
+//
+// Returns true if any element matches the given input and false otherwise
+function matchesUriInList(rawRedirectUri, listOfPatterns, logger) {
+    if (typeof listOfPatterns !== 'string') {
+        return false;
+    }
+    let validatedUri;
+    try {
+        validatedUri = new URL(rawRedirectUri);
+    }
+    catch (err) {
+        logger.warn('Tried to match invalid URI', { err });
+        return false;
+    }
+    const entries = listOfPatterns.split(',').map(s => s.trim()).filter(Boolean);
+    return entries.some(entry => {
+        if (entry.startsWith('~')) {
+            let regex;
+            try {
+                regex = new RegExp(entry.slice(1));
+            }
+            catch (err) {
+                logger.warn('Invalid regexp in allowed redirect URI list entry.', {
+                    entry,
+                    errName: err?.name,
+                    errMessage: err?.message
+                });
+                return false;
+            }
+            return regex.test(validatedUri.href);
+        }
+        // URL.href adds an extra slash at the end if the URL does not have a path
+        return validatedUri.href === entry || validatedUri.href.replace(/\/$/, '') === entry;
+    });
+}
+function toRequest(peertubeHelpers, req) {
+    const currentUrl = new URL(peertubeHelpers.config.getWebserverUrl() + req.originalUrl);
+    if (req.method === 'GET')
+        return currentUrl;
+    return new Request(currentUrl.href, {
+        method: 'POST',
+        headers: Object.entries(req.headers).reduce((acc, [key, values]) => {
+            if (Array.isArray(values)) {
+                for (const value of values) {
+                    acc.append(key, value);
+                }
+                return acc;
+            }
+            acc.append(key, values);
+            return acc;
+        }, new Headers()),
+        body: new URLSearchParams(req.body).toString()
+    });
+}
+//# sourceMappingURL=main.js.map

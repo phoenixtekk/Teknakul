@@ -1,0 +1,21 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#101a1a"/>
+      <stop offset="1" stop-color="#0a1212"/>
+    </linearGradient>
+    <linearGradient id="teal" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#2fe3cf"/>
+      <stop offset="1" stop-color="#0e9c90"/>
+    </linearGradient>
+  </defs>
+  <rect x="0" y="0" width="512" height="512" rx="116" fill="url(#bg)"/>
+  <rect x="0" y="0" width="512" height="512" rx="116" fill="none" stroke="#12b5a5" stroke-opacity="0.20" stroke-width="4"/>
+  <!-- Geometric "T": crossbar + stem, font-free for reliable rasterization -->
+  <rect x="132" y="150" width="248" height="58" rx="16" fill="url(#teal)"/>
+  <rect x="227" y="150" width="58" height="212" rx="16" fill="url(#teal)"/>
+  <!-- ascend chevron under the stem: 'rise / confidence' -->
+  <path d="M256 300 L322 366 L300 388 L256 344 L212 388 L190 366 Z" fill="#2fe3cf" opacity="0.9"/>
+  <!-- node dot: 'tech / AI' -->
+  <circle cx="256" cy="256" r="15" fill="#0a1212" stroke="#2fe3cf" stroke-width="8"/>
+</svg>

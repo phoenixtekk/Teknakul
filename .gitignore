@@ -1,0 +1,7 @@
+teknakul-server/
+.claude/
+node_modules/
+*.log
+.env
+.env.*
+*.tmp
