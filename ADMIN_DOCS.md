@@ -96,3 +96,36 @@ video/comment moderation, abuse reports. **Staff moderation before opening signu
 This is a shared production box. Never restart/delete another project's container. After any infra
 change, update `~/.claude/server-inventory.md` (linuxg1 section + "Last verified") and re-publish the
 wiki copy (`SystemDocs/linuxg-fleet-inventory`).
+
+## 12. Runbook Mode AI service (chapters + summaries)
+`/home/lacy/teknakul/services/runbook-ai/runbook_ai.py` (stdlib Python 3, no deps). For each local
+video with an English Whisper caption and no chapters, it fetches the VTT, sends it to the **Ollama box
+`http://192.168.166.182:11434` (`llama3.3:70b`)**, and writes native PeerTube **chapters** plus an AI
+**summary** (appended to the description behind a `<!-- teknakul-ai-summary -->` marker) via the local
+API (`http://127.0.0.1:3050` + `Host: teknakul.com`). Idempotent — processed UUIDs recorded in
+`state.json`; a video with chapters is skipped.
+
+- **Schedule:** cron for user `lacy`, `*/10 * * * *` → `services/runbook-ai/runbook.log`.
+- **Manual run:** `cd .../runbook-ai && python3 runbook_ai.py` (all pending) · `--video=<uuid>` (one) ·
+  `--force` (re-process even if chapters exist).
+- **Config via env:** `OLLAMA_URL`, `OLLAMA_MODEL`, `PEERTUBE_URL`, `PEERTUBE_HOST`, `PEERTUBE_ADMIN_FILE`.
+- **Creds:** PeerTube admin from `/home/lacy/teknakul/.peertube-admin` (mode 600). No secrets in the repo.
+- **Depends on:** the transcription runner (AI box `.168`) producing the caption first; and the Ollama
+  box `.182` being reachable from linuxg1 (private LAN). If either is down, videos are simply skipped and
+  retried next run.
+- **Troubleshoot:** `skip(no-caption)` = transcript not ready yet (runner still working); `skip(empty-
+  transcript)` = VTT parsed empty (check caption content); HTTP 403 = calling through the edge instead of
+  loopback (must use `127.0.0.1:3050` + Host header).
+
+## 13. Marketing site (`www.teknakul.com`)
+Self-contained static page at `/home/lacy/teknakul-www/public/index.html`, served by a minimal Node
+static server (`server.js`, no deps) on **127.0.0.1:3080** under systemd **`teknakul-www.service`**
+(`Restart=always`, enabled at boot). Source of truth: repo `www/`.
+
+- **Manage:** `sudo systemctl {status|restart} teknakul-www` · logs `journalctl -u teknakul-www`.
+- **Update content:** edit `www/index.html` in the repo, `scp` to `.../teknakul-www/public/index.html`,
+  no restart needed (static).
+- **Go public (owner TODO):** add a Public Hostname to the linuxg1 Cloudflare token tunnel (Zero Trust →
+  Networks → Tunnels → the linuxg1 tunnel → Public Hostname): subdomain `www`, domain `teknakul.com`,
+  service `HTTP://localhost:3080`. **Do not** add an apex→www redirect — the apex `teknakul.com` serves
+  the federated PeerTube app and its federation identity is permanent.

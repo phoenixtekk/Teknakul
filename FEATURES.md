@@ -33,14 +33,15 @@ Living document. **Legend:** ✅ shipped/live · 🚧 in progress · 📋 planne
 | ~~Ecosystem deep-links~~ | ⛔ dropped | Owner 2026-08-11: **zero** ecosystem integrations — no Aigartha / Mibrow / TxtYa / Workplace store / Enogye / Analytikul Ops. Teknakul is fully standalone. |
 | Deeper source-level rebrand | 📋 | Residual "PeerTube" strings; via plugin/theme, not hard fork |
 
-## Phase 2 — AI-Confidence engine (video-native, the differentiator)
+## Phase 2 — AI-Confidence engine ("Runbook Mode", video-native, the differentiator)
 | Item | Status | Notes |
 |---|---|---|
-| Auto transcripts | 📋 | Whisper on the Ollama AI box; PeerTube has a transcription plugin hook |
-| AI chapters + summaries | 📋 | Claude over transcripts |
-| Transcript search + RAG co-pilot | 📋 | pgvector; "answer from the video library" (Mibrow pattern) |
+| Auto transcripts | ✅ | Whisper (`whisper-ctranslate2`) on the AI box `.168` via PeerTube remote runner; VTT captions on every upload. Verified E2E. |
+| AI chapters + summaries | ✅ | `services/runbook-ai/runbook_ai.py` → Ollama box `.182` (`llama3.3:70b`) reads the transcript, writes native PeerTube **chapters** + an AI **summary** into the description. Runs via cron `*/10` on linuxg1. Verified E2E (6 accurate chapters + summary). |
+| "Ask this video" co-pilot | 🚧 next | Query API + watch-page player panel; answers from the transcript and jumps to the timestamp. |
+| Copyable commands/code panel | 🚧 next | Extract spoken/shown commands into a copy-ready side panel. |
+| Library-wide transcript search + RAG | 🚧 next | `nomic-embed-text` (on `.182`) → pgvector; "answer from the video library" (Mibrow pattern). |
 | AI highlight/clip generation | 📋 | |
-| "Manage X with AI" video tracks/playlists | 📋 | Linux, M365, Intune, Google Workspace, security |
 
 ## Phase 3 — Live + monetization
 | Item | Status | Notes |
@@ -53,6 +54,7 @@ Living document. **Legend:** ✅ shipped/live · 🚧 in progress · 📋 planne
 ## Cross-cutting
 | Item | Status | Notes |
 |---|---|---|
+| Marketing site (`www.teknakul.com`) | ✅ | Self-contained teal-on-charcoal site (`www/index.html`), Node static server under systemd `teknakul-www.service` on linuxg1 :3080. **Owner TODO:** add CF ingress `www.teknakul.com → localhost:3080` (no apex→www redirect). |
 | Moderation + trust | 📋 | Federated → staffed moderation before opening signups |
-| AGPL source repo | ⬜ | PeerTube is AGPL-3.0 — publish modified source before public launch |
+| AGPL source repo | ✅ | Published to github.com/phoenixtekk/Teknakul (LICENSE + custom plugins + `services/` + `www/` + docs). |
 | `www.teknakul.com` marketing site | ⬜ | Separate; apex serves the app (no apex→www redirect) |

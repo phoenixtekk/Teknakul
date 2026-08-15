@@ -57,6 +57,23 @@ account here. Your audience is yours; it isn't locked to one platform.
 
 ---
 
+## Runbook Mode — the AI features ✅
+Teknakul reads your video so viewers can learn faster. It happens automatically after you upload —
+nothing to configure.
+
+- **Auto captions/transcript** — every video with speech is transcribed. Viewers can turn captions on,
+  and the transcript makes the video searchable.
+- **AI chapters** — the video timeline is split into labelled sections (e.g. *0:14 Create the policy*).
+  Viewers click a chapter to jump straight to it. You can edit or add chapters yourself in
+  **Edit video → Chapters** if you want to fine-tune them.
+- **AI summary** — a short plain-English summary of what the video teaches is added to the description
+  (under an *"✨ AI Summary"* heading). Edit or remove it any time by editing the description.
+- **Timing** — chapters and the summary appear a few minutes after upload, once transcoding and
+  transcription finish. If you don't see them yet, check back shortly.
+
+*Coming next:* ask a question about a video and jump to the answer, a copy-ready commands panel, and
+searching across every video by what was said.
+
 ## Account & safety
 
 - **Reporting** abuse / inappropriate content 📋
