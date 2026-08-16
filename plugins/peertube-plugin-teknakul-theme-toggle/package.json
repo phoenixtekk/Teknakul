@@ -1,6 +1,6 @@
 {
   "name": "peertube-plugin-teknakul-theme-toggle",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A one-click floating light/dark theme toggle button for Teknakul.",
   "engine": { "peertube": ">=6.0.0" },
   "keywords": [ "peertube", "plugin", "peertube-plugin" ],
