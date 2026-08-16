@@ -117,6 +117,24 @@ API (`http://127.0.0.1:3050` + `Host: teknakul.com`). Idempotent — processed U
   transcript)` = VTT parsed empty (check caption content); HTTP 403 = calling through the edge instead of
   loopback (must use `127.0.0.1:3050` + Host header).
 
+### 12a. "Ask this video" co-pilot (API + watch-page plugin)
+`services/runbook-ai/ask_server.py` — a stdlib HTTP API (systemd **`teknakul-ask.service`**, **:3081**)
+that answers a question about ONE video from its transcript via Ollama and returns
+`{answer, timecode, quote, found}`. Endpoints: `GET /health`, `GET /ask?videoId=&q=`,
+`POST /ask {videoId,question}`. CORS locked to `https://teknakul.com` (`ASK_CORS_ORIGIN`).
+Manage: `sudo systemctl {status|restart} teknakul-ask`.
+
+The watch-page UI is the plugin **`peertube-plugin-teknakul-runbook`** (client scope `video-watch`):
+it injects an "✨ Ask this video" panel, calls the API, and seeks the player to the returned timecode.
+The plugin calls **`https://runbook.teknakul.com`** by default (override at runtime via
+`window.TEKNAKUL_ASK_API`).
+
+**Go live (owner TODO):** add a Public Hostname to the linuxg1 CF tunnel — subdomain `runbook`,
+domain `teknakul.com`, service `HTTP://localhost:3081`. Until then the panel shows "co-pilot
+unavailable" (the API is loopback-only). Verified E2E on the loopback: accurate answers + correct
+jump timecodes.
+**Not yet built:** library-wide transcript RAG search (`nomic-embed-text` on `.182` → pgvector).
+
 ## 13. Marketing site (`www.teknakul.com`)
 Self-contained static page at `/home/lacy/teknakul-www/public/index.html`, served by a minimal Node
 static server (`server.js`, no deps) on **127.0.0.1:3080** under systemd **`teknakul-www.service`**
