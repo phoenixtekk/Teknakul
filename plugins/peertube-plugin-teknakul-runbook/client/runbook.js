@@ -142,6 +142,53 @@ async function register ({ registerHook }) {
 
     btn.addEventListener('click', ask)
     input.addEventListener('keydown', (e) => { if (e.key === 'Enter') ask() })
+
+    // ---- Copyable commands panel (auto-loads any commands in the transcript) ----
+    loadCommands(videoId, box)
+  }
+
+  async function loadCommands (videoId, box) {
+    let data
+    try {
+      const res = await fetch(API + '/commands?videoId=' + encodeURIComponent(videoId))
+      data = await res.json()
+    } catch (e) { return }
+    if (!data || !data.commands || !data.commands.length) return
+
+    const panel = document.createElement('div')
+    Object.assign(panel.style, { marginTop: '14px', borderTop: '1px solid rgba(39,211,193,.18)', paddingTop: '12px' })
+    const h = document.createElement('div')
+    h.textContent = '⌨️ Commands in this video'
+    Object.assign(h.style, { fontWeight: '700', fontSize: '14px', marginBottom: '8px', color: TEAL })
+    panel.appendChild(h)
+
+    data.commands.forEach(c => {
+      const row = document.createElement('div')
+      Object.assign(row.style, {
+        display: 'flex', alignItems: 'center', gap: '8px', margin: '6px 0',
+        background: 'rgba(0,0,0,.25)', border: '1px solid rgba(39,211,193,.15)',
+        borderRadius: '9px', padding: '8px 10px'
+      })
+      const code = document.createElement('code')
+      code.textContent = c.command
+      Object.assign(code.style, { flex: '1', fontFamily: 'ui-monospace,Menlo,Consolas,monospace', fontSize: '13px', color: '#d7fff7', whiteSpace: 'pre-wrap', wordBreak: 'break-all' })
+      const copy = document.createElement('button')
+      copy.textContent = 'Copy'
+      Object.assign(copy.style, { flex: 'none', padding: '5px 12px', borderRadius: '7px', border: '1px solid ' + TEAL, background: 'transparent', color: TEAL, fontWeight: '700', fontSize: '12px', cursor: 'pointer' })
+      copy.addEventListener('click', () => {
+        try { navigator.clipboard.writeText(c.command); copy.textContent = 'Copied ✓'; setTimeout(() => { copy.textContent = 'Copy' }, 1500) } catch (e) {}
+      })
+      row.appendChild(code); row.appendChild(copy)
+      panel.appendChild(row)
+      if (c.timecode > 0) {
+        const jump = document.createElement('a')
+        jump.textContent = '· ' + fmt(c.timecode)
+        Object.assign(jump.style, { fontSize: '11px', color: '#8fb6b1', cursor: 'pointer', flex: 'none' })
+        jump.addEventListener('click', () => seek(c.timecode))
+        row.appendChild(jump)
+      }
+    })
+    box.appendChild(panel)
   }
 }
 

@@ -1,7 +1,7 @@
 {
   "name": "peertube-plugin-teknakul-featured-channels",
-  "version": "1.0.0",
-  "description": "Adds a Featured Channels section to the Teknakul left sidebar (auto-lists channels with videos).",
+  "version": "1.1.0",
+  "description": "Adds a Featured Channels section to the Teknakul left sidebar (auto-lists channels with videos) with channel avatars.",
   "engine": { "peertube": ">=6.0.0" },
   "keywords": [ "peertube", "plugin", "peertube-plugin" ],
   "homepage": "https://teknakul.com",
@@ -10,6 +10,6 @@
   "library": "./main.js",
   "staticDirs": {},
   "css": [],
-  "clientScripts": [ { "script": "client/featured.js", "scopes": [ "common" ] } ],
+  "clientScripts": [ { "script": "client/featured.js", "scopes": [ "common" ] }, { "script": "client/avatars.js", "scopes": [ "common" ] } ],
   "translations": {}
 }
