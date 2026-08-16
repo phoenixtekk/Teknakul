@@ -1,0 +1,34 @@
+<svg width="1920" height="400" viewBox="0 0 1920 400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#131c33"/>
+      <stop offset="1" stop-color="#0a0f1c"/>
+    </linearGradient>
+    <radialGradient id="aura" cx="32%" cy="45%" r="60%">
+      <stop offset="0" stop-color="#6366f1" stop-opacity="0.40"/>
+      <stop offset="0.45" stop-color="#38bdf8" stop-opacity="0.14"/>
+      <stop offset="1" stop-color="#0a0f1c" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="ind" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#a5b4fc"/>
+      <stop offset="1" stop-color="#38bdf8"/>
+    </linearGradient>
+    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse">
+      <path d="M48 0 L0 0 0 48" fill="none" stroke="#6366f1" stroke-opacity="0.09" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <rect width="1920" height="400" fill="url(#bg)"/>
+  <rect width="1920" height="400" fill="url(#grid)"/>
+  <rect width="1920" height="400" fill="url(#aura)"/>
+  <!-- monogram tile -->
+  <g transform="translate(150,105)">
+    <rect width="190" height="190" rx="46" fill="#0d1424"/>
+    <rect x="1" y="1" width="188" height="188" rx="45" fill="none" stroke="#6366f1" stroke-opacity="0.3" stroke-width="2"/>
+    <rect x="44" y="58" width="102" height="24" rx="8" fill="url(#ind)"/>
+    <rect x="83" y="58" width="24" height="90" rx="8" fill="url(#ind)"/>
+    <path d="M95 116 L122 143 L113 152 L95 134 L77 152 L68 143 Z" fill="#38bdf8"/>
+  </g>
+  <!-- wordmark -->
+  <text x="400" y="215" font-family="'DejaVu Sans','Noto Sans',Arial,sans-serif" font-size="128" font-weight="800" letter-spacing="3" fill="#f1f5f9">TEKNAKUL</text>
+  <text x="404" y="278" font-family="'DejaVu Sans','Noto Sans',Arial,sans-serif" font-size="29" font-weight="500" letter-spacing="4" fill="#94a3b8">CONFIDENT, AI-AUGMENTED OPERATORS OF THE MODERN WORKPLACE</text>
+</svg>

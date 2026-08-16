@@ -1,0 +1,21 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#141d33"/>
+      <stop offset="1" stop-color="#0b1120"/>
+    </linearGradient>
+    <linearGradient id="ind" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#818cf8"/>
+      <stop offset="1" stop-color="#38bdf8"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="116" fill="url(#bg)"/>
+  <rect x="2" y="2" width="508" height="508" rx="114" fill="none" stroke="#6366f1" stroke-opacity="0.28" stroke-width="4"/>
+  <!-- Geometric "T": crossbar + stem -->
+  <rect x="132" y="150" width="248" height="58" rx="16" fill="url(#ind)"/>
+  <rect x="227" y="150" width="58" height="212" rx="16" fill="url(#ind)"/>
+  <!-- ascend chevron: 'rise / confidence' -->
+  <path d="M256 300 L322 366 L300 388 L256 344 L212 388 L190 366 Z" fill="#38bdf8" opacity="0.95"/>
+  <!-- node dot: 'tech / AI' -->
+  <circle cx="256" cy="256" r="15" fill="#0b1120" stroke="#38bdf8" stroke-width="8"/>
+</svg>
