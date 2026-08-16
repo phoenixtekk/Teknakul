@@ -129,11 +129,23 @@ it injects an "✨ Ask this video" panel, calls the API, and seeks the player to
 The plugin calls **`https://runbook.teknakul.com`** by default (override at runtime via
 `window.TEKNAKUL_ASK_API`).
 
-**Go live (owner TODO):** add a Public Hostname to the linuxg1 CF tunnel — subdomain `runbook`,
-domain `teknakul.com`, service `HTTP://localhost:3081`. Until then the panel shows "co-pilot
-unavailable" (the API is loopback-only). Verified E2E on the loopback: accurate answers + correct
-jump timecodes.
-**Not yet built:** library-wide transcript RAG search (`nomic-embed-text` on `.182` → pgvector).
+**Live:** CF route `runbook.teknakul.com → http://localhost:3081` is in place; verified public
+(health 200, `/ask` returns answers + jump timecodes with the correct CORS header).
+
+### 12b. Copyable commands + library-wide transcript search
+Same `teknakul-ask` service (:3081) also serves:
+- **`GET /commands?videoId=`** — extracts runnable commands/cmdlets from the transcript via Ollama
+  (`{commands:[{command,description,timecode}]}`). Surfaced by the runbook plugin's watch-page
+  "⌨️ Commands in this video" panel (copy buttons + jump). Verified (reconstructs
+  `Connect-MgGraph -Scope …`, `Get-MgUser -All`, `docker compose up -d --build`, `az login`).
+- **`GET /search?q=&k=`** — semantic transcript search. Cosine similarity of the query embedding
+  against `rag_index.json` (built by `rag_index.py` → `nomic-embed-text` on `.182`, chunked ~45s/320c).
+  Returns `{results:[{name,shortUUID,timecode,text,score}], indexed}`. Verified (correct chunk + timecode).
+- **`GET /` or `/search-ui`** — a self-contained search page (**https://runbook.teknakul.com/search-ui**);
+  results link to `teknakul.com/w/<shortUUID>?start=<tc>`. (Optional: add a left-nav link to it.)
+
+**Index refresh:** `rag_index.py` via cron `17 * * * *` (user `lacy`) → `rag.log`. Indexes instance-owned
+public+unlisted videos (skips private/internal). Rebuild manually: `python3 rag_index.py`.
 
 ## 13. Marketing site (`www.teknakul.com`)
 Self-contained static page at `/home/lacy/teknakul-www/public/index.html`, served by a minimal Node
