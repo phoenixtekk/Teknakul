@@ -137,6 +137,27 @@
   .foot{display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap;align-items:center}
   .foot a:hover{color:var(--indigo)}
   .foot .l{display:flex;gap:22px;flex-wrap:wrap}
+
+  /* hero mascot greeter */
+  .hero-mascot{position:absolute;right:12px;top:70px;width:300px;z-index:2;pointer-events:none}
+  .hero-mascot img{width:100%;display:block;filter:drop-shadow(0 22px 45px rgba(56,189,248,.4))}
+  .hm-aura{position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);width:340px;height:340px;border-radius:50%;z-index:-1;filter:blur(12px);
+    background:radial-gradient(circle,rgba(99,102,241,.4),rgba(56,189,248,.2) 45%,transparent 70%)}
+  @media(max-width:1240px){.hero-mascot{display:none}}
+
+  /* audiences / crew */
+  .crew-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+  @media(max-width:860px){.crew-grid{grid-template-columns:1fr;max-width:420px;margin:0 auto}}
+  .crew-card{background:linear-gradient(180deg,#0f172a,#0a0f1c);border:1px solid rgba(99,102,241,.25);border-radius:20px;padding:0 26px 28px;text-align:center;position:relative;overflow:hidden;transition:.2s}
+  .crew-card:hover{transform:translateY(-4px);border-color:rgba(62,189,248,.55);box-shadow:0 26px 55px -26px rgba(56,189,248,.45)}
+  .crew-img{position:relative;height:290px;margin:0 -26px 8px;display:flex;align-items:flex-end;justify-content:center}
+  .crew-img::before{content:"";position:absolute;left:50%;top:44%;transform:translate(-50%,-50%);width:250px;height:250px;border-radius:50%;
+    background:radial-gradient(circle,rgba(99,102,241,.32),rgba(56,189,248,.14) 50%,transparent 70%);filter:blur(8px)}
+  .crew-img img{position:relative;height:290px;width:auto;max-width:100%;object-fit:contain;filter:drop-shadow(0 16px 32px rgba(0,0,0,.55))}
+  .crew-card h3{color:#f1f5f9;font-size:22px;margin-bottom:10px}
+  .crew-card p{color:#94a3b8;font-size:15px;line-height:1.55;margin:0 0 16px}
+  .crew-tags{display:flex;flex-wrap:wrap;gap:7px;justify-content:center}
+  .crew-tag{font-size:12px;font-weight:600;color:#7dd3fc;border:1px solid rgba(62,189,248,.3);border-radius:999px;padding:3px 11px}
 </style>
 </head>
 <body>
@@ -150,6 +171,7 @@
     </a>
     <div class="navlinks">
       <a href="#different">Why</a>
+      <a href="#crew">Audiences</a>
       <a href="#runbook">Runbook Mode</a>
       <a href="#categories">Categories</a>
       <a href="#federation">Federation</a>
@@ -162,6 +184,7 @@
 <section class="hero">
   <div class="grid-bg"></div>
   <div class="aura"></div>
+  <div class="hero-mascot"><span class="hm-aura"></span><img src="/Teknakul-Mascot1.png" alt="Teknakul mascot waving hello" loading="eager"></div>
   <div class="wrap">
     <span class="eyebrow"><span class="ping"></span> Now in early access · AI Runbook Mode is live</span>
     <h1>The streaming platform<br>for <span class="grad">technical people</span>.</h1>
@@ -203,6 +226,36 @@
       <div class="card"><div class="ic">🖥️</div><h3>A platform for technical people</h3><p>Code-alongs, homelab tours, Intune / M365 / Google Workspace walkthroughs, security demos, and "build in public." Categories and discovery tuned to this audience — not lifestyle vlogs.</p></div>
       <div class="card"><div class="ic">🤖</div><h3>AI-native for learning</h3><p>Auto transcripts, chapters, and summaries on every upload. Search across the whole library by what was <em>said</em>. Ask a co-pilot that answers from the video and jumps you to the exact timestamp.</p></div>
       <div class="card"><div class="ic">🌐</div><h3>Creator-owned &amp; federated</h3><p>Your channel federates across the Fediverse. You own your audience and your content — no opaque algorithm holding your reach hostage. Portable by design.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="crew">
+  <div class="wrap">
+    <div class="stitle">
+      <span class="kicker">Three crews, one platform</span>
+      <h2>Who Teknakul is for</h2>
+      <p>Technical pros, gamers, and independent news creators — all creator‑owned, all federated, all in one place.</p>
+    </div>
+    <div class="crew-grid">
+      <div class="crew-card">
+        <div class="crew-img"><img src="/Teknakul-Mascot3.png" alt="Teknakul mascot holding a tool and a TEKNAKUL tablet"></div>
+        <h3>Technical &amp; IT</h3>
+        <p>Run the Modern Workplace. Microsoft 365, Intune, Google Workspace, security, homelab, and scripting — watch real operators do it, then do it yourself with AI in your corner.</p>
+        <div class="crew-tags"><span class="crew-tag">#Intune</span><span class="crew-tag">#Security</span><span class="crew-tag">#Homelab</span><span class="crew-tag">#PowerShell</span></div>
+      </div>
+      <div class="crew-card">
+        <div class="crew-img"><img src="/Teknakul-Mascot2.png" alt="Teknakul mascot with a game controller"></div>
+        <h3>Gamers</h3>
+        <p>Go live and play. Stream your gameplay, grow a real community, and own your channel — no algorithm deciding who gets to see you. Controller in hand, reach on your terms.</p>
+        <div class="crew-tags"><span class="crew-tag">#LiveStreams</span><span class="crew-tag">#Gameplay</span><span class="crew-tag">#Speedruns</span><span class="crew-tag">#Co‑op</span></div>
+      </div>
+      <div class="crew-card">
+        <div class="crew-img"><img src="/Teknakul-Mascot4.png" alt="Teknakul mascot with a broadcast headset"></div>
+        <h3>News &amp; Creators</h3>
+        <p>Break the story. Independent news, commentary, and creators — federated and creator‑owned, so your audience and your reach belong to you, not to a platform.</p>
+        <div class="crew-tags"><span class="crew-tag">#News</span><span class="crew-tag">#Commentary</span><span class="crew-tag">#Podcasts</span><span class="crew-tag">#Live</span></div>
+      </div>
     </div>
   </div>
 </section>
