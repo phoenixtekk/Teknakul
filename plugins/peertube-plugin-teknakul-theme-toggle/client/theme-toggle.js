@@ -28,7 +28,7 @@ async function register () {
     Object.assign(btn.style, {
       position: 'fixed', right: '18px', bottom: '18px', zIndex: '99999',
       width: '44px', height: '44px', borderRadius: '50%', border: 'none', cursor: 'pointer',
-      background: '#27d3c1', color: '#0b0d11', fontSize: '20px', padding: '0',
+      background: '#6366f1', color: '#ffffff', fontSize: '20px', padding: '0',
       display: 'flex', alignItems: 'center', justifyContent: 'center',
       boxShadow: '0 2px 12px rgba(0,0,0,.4)'
     })
