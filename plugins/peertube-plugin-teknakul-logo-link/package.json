@@ -1,0 +1,15 @@
+{
+  "name": "peertube-plugin-teknakul-logo-link",
+  "version": "1.0.0",
+  "description": "Header logo icon links to the marketing site (www.teknakul.com); the instance name keeps linking to the platform home.",
+  "engine": { "peertube": ">=6.0.0" },
+  "keywords": [ "peertube", "plugin", "peertube-plugin" ],
+  "homepage": "https://teknakul.com",
+  "author": "Teknakul",
+  "bugs": "https://teknakul.com",
+  "library": "./main.js",
+  "staticDirs": {},
+  "css": [],
+  "clientScripts": [ { "script": "client/logo-link.js", "scopes": [ "common" ] } ],
+  "translations": {}
+}
