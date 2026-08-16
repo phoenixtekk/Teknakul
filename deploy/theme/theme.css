@@ -12,7 +12,14 @@ html[data-pt-theme=peertube-core-light-beige]{
   --on-primary:#ffffff!important;
   --border-primary:#c7d2fe!important;       /* indigo-200 */
   --fg:#0f172a!important;                    /* slate-900 - strong dark text */
-  --fg-200:#475569!important;                /* slate-600 - secondary text */
+  --fg-100:#172033!important;
+  --fg-150:#1f2a3d!important;
+  --fg-200:#334155!important;                /* slate-700 - secondary text (darkened for contrast) */
+  --fg-250:#3d4a5f!important;
+  --fg-300:#475569!important;                /* slate-600 */
+  --fg-350:#556173!important;
+  --fg-400:#64748b!important;                /* slate-500 - most muted */
+  --fg-450:#64748b!important;
   --bg:#ffffff!important;                     /* white */
   --bg-secondary:#e2e8f0!important;          /* slate-200 */
   --bg-secondary-500:#e2e8f0!important;
@@ -36,8 +43,15 @@ html[data-pt-theme=peertube-core-dark-brown]{
   --primary:#818cf8!important;               /* indigo-400 (brighter on dark) */
   --on-primary:#0b1120!important;
   --border-primary:#334155!important;        /* slate-700 */
-  --fg:#e2e8f0!important;                     /* slate-200 text */
-  --fg-200:#94a3b8!important;                 /* slate-400 secondary */
+  --fg:#f1f5f9!important;                      /* slate-100 - bright main text */
+  --fg-100:#eaeff7!important;
+  --fg-150:#e2e8f0!important;
+  --fg-200:#d3dce8!important;                  /* secondary text - kept bright */
+  --fg-250:#c3cddc!important;
+  --fg-300:#b2bece!important;
+  --fg-350:#a1aec2!important;                  /* muted */
+  --fg-400:#94a3b8!important;                  /* slate-400 - most muted, still readable */
+  --fg-450:#94a3b8!important;
   --bg:#0b1120!important;                      /* slate-950 navy */
   --bg-secondary:#0f1729!important;
   --bg-secondary-500:#0f1729!important;
