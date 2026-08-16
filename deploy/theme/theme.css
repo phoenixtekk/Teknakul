@@ -8,9 +8,9 @@
 
 /* ---------- LIGHT (peertube-core-light-beige -> Enogye light) ---------- */
 html[data-pt-theme=peertube-core-light-beige]{
-  --primary:#6366f1!important;              /* indigo-500 accent */
-  --on-primary:#ffffff!important;
-  --border-primary:#c7d2fe!important;       /* indigo-200 */
+  --primary:#3ebdf8!important;              /* sky button/accent */
+  --on-primary:#0b1120!important;           /* dark text on the light sky button */
+  --border-primary:#bae6fd!important;       /* sky-200 */
   --fg:#0f172a!important;                    /* slate-900 - strong dark text */
   --fg-100:#172033!important;
   --fg-150:#1f2a3d!important;
@@ -32,16 +32,16 @@ html[data-pt-theme=peertube-core-light-beige]{
   --input-bg:#ffffff!important;              /* white search box (was pink) */
   --secondary-icon-color:#64748b!important;  /* slate-500 */
   --input-placeholder:#94a3b8!important;     /* slate-400 */
-  --primary-50:#312e81!important;--primary-100:#3730a3!important;--primary-200:#4338ca!important;
-  --primary-300:#4f46e5!important;--primary-400:#6366f1!important;--primary-500:#6366f1!important;
-  --primary-600:#818cf8!important;--primary-700:#a5b4fc!important;--primary-800:#c7d2fe!important;
-  --primary-900:#e0e7ff!important;--primary-950:#eef2ff!important;
+  --primary-50:#082f49!important;--primary-100:#0c4a6e!important;--primary-200:#075985!important;
+  --primary-300:#0369a1!important;--primary-400:#0284c7!important;--primary-500:#0ea5e9!important;
+  --primary-600:#38bdf8!important;--primary-700:#7dd3fc!important;--primary-800:#bae6fd!important;
+  --primary-900:#e0f2fe!important;--primary-950:#f0f9ff!important;
 }
 
 /* ---------- DARK (peertube-core-dark-brown -> Enogye dark navy) ---------- */
 html[data-pt-theme=peertube-core-dark-brown]{
-  --primary:#818cf8!important;               /* indigo-400 accent (kept) */
-  --on-primary:#0e0e10!important;
+  --primary:#3ebdf8!important;               /* sky button/accent */
+  --on-primary:#0b1120!important;            /* dark text on the light sky button */
   --border-primary:#3a3a3d!important;        /* subtle neutral border */
   --fg:#efeff1!important;                      /* Twitch near-white text */
   --fg-100:#e6e6ea!important;
@@ -64,10 +64,10 @@ html[data-pt-theme=peertube-core-dark-brown]{
   --input-bg:#18181b!important;
   --secondary-icon-color:#adadb8!important;
   --input-placeholder:#7a7a85!important;
-  --primary-50:#eef2ff!important;--primary-100:#e0e7ff!important;--primary-200:#c7d2fe!important;
-  --primary-300:#a5b4fc!important;--primary-400:#818cf8!important;--primary-500:#6366f1!important;
-  --primary-600:#4f46e5!important;--primary-700:#4338ca!important;--primary-800:#3730a3!important;
-  --primary-900:#312e81!important;--primary-950:#1e1b4b!important;
+  --primary-50:#f0f9ff!important;--primary-100:#e0f2fe!important;--primary-200:#bae6fd!important;
+  --primary-300:#7dd3fc!important;--primary-400:#38bdf8!important;--primary-500:#0ea5e9!important;
+  --primary-600:#0284c7!important;--primary-700:#0369a1!important;--primary-800:#075985!important;
+  --primary-900:#0c4a6e!important;--primary-950:#082f49!important;
 }
 
 /* ---------- Starfield (injected by peertube-plugin-teknakul-starfield) ---------- */
@@ -98,12 +98,12 @@ a.menu-link.active my-global-icon,a.menu-link.router-link-active my-global-icon{
 /* ============================================================
    Custom homepage (Rumble-style mock grid) — indigo/slate
    ============================================================ */
-.tk-home{max-width:1400px;margin:0 auto;padding:4px 0 40px;--tk-ind:#6366f1;--tk-sky:#38bdf8}
+.tk-home{max-width:1400px;margin:0 auto;padding:4px 0 40px;--tk-ind:#3ebdf8;--tk-sky:#38bdf8}
 .tk-home a{text-decoration:none;color:inherit}
 .tk-chips{display:flex;gap:9px;flex-wrap:wrap;padding:6px 0 20px;border-bottom:1px solid var(--bg-secondary-400);margin-bottom:22px}
 .tk-chip{padding:7px 15px;border-radius:999px;font-size:14px;font-weight:600;background:var(--bg-secondary-400);color:var(--fg);transition:.15s;white-space:nowrap}
 .tk-chip:hover{background:var(--bg-secondary-450)}
-.tk-chip.on{background:var(--tk-ind);color:#fff}
+.tk-chip.on{background:var(--tk-ind);color:#0b1120}
 .tk-chip-live{color:#ef4444}.tk-chip-live:hover{color:#fff;background:#ef4444}
 .tk-hero{display:grid;grid-template-columns:1.7fr 1fr;gap:18px;margin-bottom:34px}
 .tk-side{display:flex;flex-direction:column;gap:14px}
@@ -147,6 +147,6 @@ a.menu-link.active my-global-icon,a.menu-link.router-link-active my-global-icon{
 .tk-cta-in h2{font-size:26px;font-weight:800;margin:0;color:var(--fg)}
 .tk-cta-in p{color:var(--fg-200);margin:12px 0 22px}
 .tk-cta-row{display:inline-flex;gap:12px;flex-wrap:wrap;justify-content:center}
-.tk-btn{padding:11px 22px;border-radius:11px;font-weight:700;font-size:15px;background:#6366f1;color:#fff}
-.tk-btn-ghost{background:transparent;color:var(--fg);border:1px solid rgba(99,102,241,.4)}
+.tk-btn{padding:11px 22px;border-radius:11px;font-weight:700;font-size:15px;background:#3ebdf8;color:#0b1120}
+.tk-btn-ghost{background:transparent;color:var(--fg);border:1px solid rgba(62,189,248,.5)}
 .tk-btn:hover{filter:brightness(1.08)}

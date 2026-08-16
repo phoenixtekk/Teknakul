@@ -2,7 +2,7 @@
 // Asks the self-hosted co-pilot API a question about the current video, shows the
 // answer + a verbatim quote, and jumps the player to the most relevant timestamp.
 async function register ({ registerHook }) {
-  const TEAL = '#27d3c1'
+  const TEAL = '#3ebdf8'
   // Public endpoint of the ask API (Cloudflare route -> linuxg1:3081). Override-able.
   const API = (window.TEKNAKUL_ASK_API || 'https://runbook.teknakul.com').replace(/\/$/, '')
 

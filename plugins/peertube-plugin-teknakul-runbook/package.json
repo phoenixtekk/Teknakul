@@ -1,6 +1,6 @@
 {
   "name": "peertube-plugin-teknakul-runbook",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Runbook Mode: an 'Ask this video' AI co-pilot + copyable-commands panel on the watch page (answers from the transcript and jumps to the timestamp).",
   "engine": { "peertube": ">=6.0.0" },
   "keywords": [ "peertube", "plugin", "peertube-plugin" ],
