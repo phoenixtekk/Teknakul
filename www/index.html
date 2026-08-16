@@ -148,12 +148,14 @@
   /* audiences / crew */
   .crew-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
   @media(max-width:860px){.crew-grid{grid-template-columns:1fr;max-width:420px;margin:0 auto}}
-  .crew-card{background:linear-gradient(180deg,#0f172a,#0a0f1c);border:1px solid rgba(99,102,241,.25);border-radius:20px;padding:0 26px 28px;text-align:center;position:relative;overflow:hidden;transition:.2s}
+  .crew-card{background:linear-gradient(180deg,#0f172a,#0a0f1c);border:1px solid rgba(99,102,241,.25);border-radius:20px;padding:22px 26px 28px;text-align:center;position:relative;overflow:hidden;transition:.2s}
   .crew-card:hover{transform:translateY(-4px);border-color:rgba(62,189,248,.55);box-shadow:0 26px 55px -26px rgba(56,189,248,.45)}
-  .crew-img{position:relative;height:290px;margin:0 -26px 8px;display:flex;align-items:flex-end;justify-content:center}
-  .crew-img::before{content:"";position:absolute;left:50%;top:44%;transform:translate(-50%,-50%);width:250px;height:250px;border-radius:50%;
-    background:radial-gradient(circle,rgba(99,102,241,.32),rgba(56,189,248,.14) 50%,transparent 70%);filter:blur(8px)}
-  .crew-img img{position:relative;height:290px;width:auto;max-width:100%;object-fit:contain;filter:drop-shadow(0 16px 32px rgba(0,0,0,.55))}
+  .crew-img{position:relative;height:278px;margin:0 -26px 10px;display:flex;align-items:flex-end;justify-content:center}
+  /* Radial glow behind every mascot (matches the Gamers mascot's baked-in glow),
+     so the transparent mascots don't read as a flat black box. */
+  .crew-img::before{content:"";position:absolute;inset:0;
+    background:radial-gradient(ellipse 60% 52% at 50% 46%,rgba(62,189,248,.4),rgba(99,102,241,.2) 42%,transparent 72%)}
+  .crew-img img{position:relative;height:258px;width:auto;max-width:100%;object-fit:contain;filter:drop-shadow(0 16px 32px rgba(0,0,0,.55))}
   .crew-card h3{color:#f1f5f9;font-size:22px;margin-bottom:10px}
   .crew-card p{color:#94a3b8;font-size:15px;line-height:1.55;margin:0 0 16px}
   .crew-tags{display:flex;flex-wrap:wrap;gap:7px;justify-content:center}
