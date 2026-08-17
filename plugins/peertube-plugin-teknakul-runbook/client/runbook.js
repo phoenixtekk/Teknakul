@@ -56,9 +56,10 @@ async function register ({ registerHook }) {
     const box = document.createElement('div')
     box.id = 'tk-runbook'
     Object.assign(box.style, {
-      border: '1px solid rgba(39,211,193,.28)', borderRadius: '14px',
+      border: '1px solid rgba(62,189,248,.35)', borderRadius: '14px',
       padding: '16px 18px', margin: '18px 0',
-      background: 'linear-gradient(180deg,rgba(39,211,193,.06),transparent)'
+      background: '#0f1729', color: '#e6edf5',
+      boxShadow: '0 10px 30px -12px rgba(0,0,0,.6)'
     })
 
     const title = document.createElement('div')
@@ -66,7 +67,7 @@ async function register ({ registerHook }) {
     Object.assign(title.style, { fontWeight: '700', fontSize: '16px', marginBottom: '4px', color: TEAL })
     const sub = document.createElement('div')
     sub.textContent = 'AI co-pilot — answers from the transcript and jumps you to the moment.'
-    Object.assign(sub.style, { fontSize: '13px', opacity: '.7', marginBottom: '12px' })
+    Object.assign(sub.style, { fontSize: '13px', color: '#9fb0c4', marginBottom: '12px' })
 
     const row = document.createElement('div')
     Object.assign(row.style, { display: 'flex', gap: '8px' })
@@ -75,8 +76,8 @@ async function register ({ registerHook }) {
     input.placeholder = 'e.g. Where do they assign the policy?'
     Object.assign(input.style, {
       flex: '1', padding: '10px 12px', borderRadius: '10px',
-      border: '1px solid rgba(39,211,193,.3)', background: 'var(--input-bg,rgba(0,0,0,.15))',
-      color: 'inherit', fontSize: '14px', outline: 'none'
+      border: '1px solid rgba(62,189,248,.35)', background: '#0b1120',
+      color: '#e6edf5', fontSize: '14px', outline: 'none'
     })
     const btn = document.createElement('button')
     btn.textContent = 'Ask'
@@ -86,7 +87,7 @@ async function register ({ registerHook }) {
     })
 
     const out = document.createElement('div')
-    Object.assign(out.style, { marginTop: '12px', fontSize: '14.5px', lineHeight: '1.55', display: 'none' })
+    Object.assign(out.style, { marginTop: '12px', fontSize: '14.5px', lineHeight: '1.55', color: '#e6edf5', display: 'none' })
 
     row.appendChild(input); row.appendChild(btn)
     box.appendChild(title); box.appendChild(sub); box.appendChild(row); box.appendChild(out)

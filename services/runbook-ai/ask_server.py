@@ -252,7 +252,15 @@ class Handler(BaseHTTPRequestHandler):
         pass
 
     def do_OPTIONS(self):
-        self._send(204, {})
+        # A 204 MUST NOT carry a body; sending one makes Cloudflare return 520 and the
+        # browser's CORS preflight fails ("Failed to fetch"). Send headers only.
+        self.send_response(204)
+        self.send_header("Access-Control-Allow-Origin", CORS_ORIGIN)
+        self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+        self.send_header("Access-Control-Allow-Headers", "Content-Type")
+        self.send_header("Access-Control-Max-Age", "86400")
+        self.send_header("Content-Length", "0")
+        self.end_headers()
 
     def _handle(self, video_id, question):
         if not video_id or not question:
