@@ -101,9 +101,14 @@ port‑forward to **`ingest.teknakul.com`** (DNS‑only A record → `38.188.128
 - **RTMP URL (OBS "Server"):** `rtmp://ingest.teknakul.com:1935/live`
 - **Stream key:** per‑live, generated when a creator makes a "Go live" video (Publish → Go live).
 - **OBS:** Settings → Stream → Service **Custom** → Server = the RTMP URL → Stream Key = the key.
-- **Encoder guidance (passthrough):** CBR, 3000–6000 Kbps, **keyframe interval 2s**, 720p/1080p, AAC 128k.
-- **Live transcoding is OFF** (passthrough = single quality, lowest latency). For Twitch‑style adaptive
-  multi‑resolution, enable `live.transcoding` and offload to the AI‑box remote runner.
+- **Encoder guidance:** CBR, 3000–6000 Kbps, **keyframe interval 2s**, 720p/1080p, AAC 128k.
+- **Live transcoding is ON (adaptive), offloaded to the AI‑box remote runner** (2026-08-16):
+  `live.transcoding.enabled=true`, `remoteRunners.enabled=true`, resolutions **360p/480p/720p** +
+  `alwaysTranscodeOriginalResolution=true` (so the source quality is also offered). Viewers get a
+  Twitch‑style quality selector. Real‑time transcoding runs on the 32‑core AI box (runner `ai-box`),
+  not linuxg1. If the runner is offline, transcoded lives won't process — check `GET /api/v1/runners`.
+  Trade‑off: transcoded live adds some latency vs passthrough. To revert to single‑quality/low‑latency,
+  set `live.transcoding.enabled=false`.
 - ⚠️ `PEERTUBE_LIVE_RTMP_PUBLIC_HOSTNAME=ingest.teknakul.com` must keep its DNS‑only record + the UniFi
   WAN TCP 1935 → linuxg1 forward. `teknakul.com:1935` is intentionally NOT reachable (proxied).
 
