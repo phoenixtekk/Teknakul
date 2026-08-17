@@ -1,0 +1,15 @@
+{
+  "name": "peertube-plugin-teknakul-multistream",
+  "version": "1.0.0",
+  "description": "Multistream — a Pro-gated page to manage restream destinations (Twitch/YouTube/Kick/custom) that Teknakul fans your live out to.",
+  "engine": { "peertube": ">=6.0.0" },
+  "keywords": [ "peertube", "plugin", "peertube-plugin" ],
+  "homepage": "https://teknakul.com",
+  "author": "Teknakul",
+  "bugs": "https://teknakul.com",
+  "library": "./main.js",
+  "staticDirs": {},
+  "css": [],
+  "clientScripts": [ { "script": "client/multistream.js", "scopes": [ "common" ] } ],
+  "translations": {}
+}

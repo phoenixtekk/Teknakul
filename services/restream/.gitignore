@@ -1,0 +1,4 @@
+restream.db
+.secret
+entitlements.json
+*.log
