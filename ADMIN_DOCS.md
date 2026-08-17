@@ -92,6 +92,21 @@ instance. Keep any external services (AI transcripts/co-pilot) as separate proce
 PeerTube federates (ActivityPub). Admin → moderation tools: instance follows/followers, blocklists,
 video/comment moderation, abuse reports. **Staff moderation before opening signups.**
 
+## 10a. Live streaming (OBS / RTMP) — ENABLED
+Live is enabled (`live.enabled=true`, `allowReplay=true`, maxInstanceLives 3 / maxUserLives 1).
+RTMP ingest listens on **:1935** (container `0.0.0.0:1935`), exposed publicly via the owner's UniFi
+port‑forward to **`ingest.teknakul.com`** (DNS‑only A record → `38.188.128.3`, **not** Cloudflare‑proxied
+— RTMP can't traverse the HTTP tunnel). Verified reachable from the public internet.
+
+- **RTMP URL (OBS "Server"):** `rtmp://ingest.teknakul.com:1935/live`
+- **Stream key:** per‑live, generated when a creator makes a "Go live" video (Publish → Go live).
+- **OBS:** Settings → Stream → Service **Custom** → Server = the RTMP URL → Stream Key = the key.
+- **Encoder guidance (passthrough):** CBR, 3000–6000 Kbps, **keyframe interval 2s**, 720p/1080p, AAC 128k.
+- **Live transcoding is OFF** (passthrough = single quality, lowest latency). For Twitch‑style adaptive
+  multi‑resolution, enable `live.transcoding` and offload to the AI‑box remote runner.
+- ⚠️ `PEERTUBE_LIVE_RTMP_PUBLIC_HOSTNAME=ingest.teknakul.com` must keep its DNS‑only record + the UniFi
+  WAN TCP 1935 → linuxg1 forward. `teknakul.com:1935` is intentionally NOT reachable (proxied).
+
 ## 11. Fleet hygiene
 This is a shared production box. Never restart/delete another project's container. After any infra
 change, update `~/.claude/server-inventory.md` (linuxg1 section + "Last verified") and re-publish the

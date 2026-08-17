@@ -46,7 +46,7 @@ Living document. **Legend:** ✅ shipped/live · 🚧 in progress · 📋 planne
 ## Phase 3 — Live + monetization
 | Item | Status | Notes |
 |---|---|---|
-| Live streaming (RTMP) | 📋 | **Blocked on ingest:** RTMP can't cross the HTTP tunnel — needs direct port or CF Spectrum |
+| Live streaming (RTMP / OBS) | ✅ | **LIVE.** OBS → `rtmp://ingest.teknakul.com:1935/live` + per‑live stream key (Publish → Go live). Ingest on :1935 via UniFi forward to the DNS‑only `ingest.teknakul.com`. Verified publicly reachable. Passthrough (live transcoding off). |
 | Channel memberships / Pro tier | 📋 | Stripe; see `BILLING.md` |
 | Creator payouts | 📋 | Revisit processor (Connect vs MoR) — payouts change the risk profile |
 | Mentor/office-hours live | 📋 | |
