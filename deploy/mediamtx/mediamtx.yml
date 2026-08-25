@@ -1,0 +1,36 @@
+# Teknakul Go — WebRTC (WHIP) ingest gateway.
+# Browser publishes WebRTC to this server; on ready we push it as RTMP into PeerTube
+# (rtmp://127.0.0.1:1935/live/<key>), which then multistreams via the restream engine.
+# The WHIP publish path IS the PeerTube live stream key, so no per-session config is needed.
+logLevel: info
+api: yes
+apiAddress: 127.0.0.1:9997
+metrics: no
+pprof: no
+
+# We don't ingest RTMP/HLS/SRT here (PeerTube owns :1935); we push OUT via runOnReady.
+rtmp: no
+hls: no
+srt: no
+
+# RTSP is internal only — used by ffmpeg to read the ingested WebRTC stream.
+rtsp: yes
+rtspAddress: 127.0.0.1:8554
+rtspTransports: [tcp]
+
+# WebRTC / WHIP
+webrtc: yes
+webrtcAddress: :8889                 # HTTP signaling (Cloudflare terminates TLS -> localhost:8889)
+webrtcEncryption: no
+webrtcLocalUDPAddress: :8189          # ICE media (owner must forward WAN UDP 8189 -> linuxg1)
+webrtcAdditionalHosts: [ingest.teknakul.com]
+webrtcIPsFromInterfaces: yes
+webrtcHandshakeTimeout: 10s
+
+pathDefaults:
+  # When a browser goes live, remux the WebRTC stream to RTMP into PeerTube with -c copy.
+  runOnReady: ffmpeg -nostdin -hide_banner -loglevel warning -rtsp_transport tcp -i rtsp://127.0.0.1:8554/$MTX_PATH -c copy -f flv rtmp://127.0.0.1:1935/live/$MTX_PATH
+  runOnReadyRestart: yes
+
+paths:
+  all_others:

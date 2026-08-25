@@ -49,6 +49,8 @@ DB_PATH       = os.environ.get("RESTREAM_DB", "/home/lacy/teknakul/services/rest
 SECRET_FILE   = os.environ.get("RESTREAM_SECRET_FILE", "/home/lacy/teknakul/services/restream/.secret")
 ENT_FILE      = os.environ.get("RESTREAM_ENTITLEMENTS", "/home/lacy/teknakul/services/restream/entitlements.json")
 POLL_SECONDS  = int(os.environ.get("RESTREAM_POLL", "15"))
+PUBLIC_APP    = os.environ.get("PUBLIC_APP_URL", "https://teknakul.com")
+GO_WHIP_HOST  = os.environ.get("GO_WHIP_HOST", "https://go.teknakul.com").rstrip("/")
 GLOBAL_MAX_FANOUT = int(os.environ.get("RESTREAM_GLOBAL_MAX", "24"))  # safety cap on concurrent ffmpeg pushes
 
 PLATFORMS = {
@@ -156,6 +158,39 @@ def whoami(user_token):
     """Resolve the caller from their PeerTube bearer token."""
     me = pt_get("/api/v1/users/me", user_token)
     return me.get("username") if me else None
+
+
+def create_live(user_token, name):
+    """Create a live video owned by the caller and return its stream key + WHIP url.
+    Teknakul Go: the browser publishes WebRTC to the gateway at /<streamKey>/whip,
+    the gateway pushes it into this live, and the restream engine multistreams it."""
+    import uuid as _uuid
+    me = pt_get("/api/v1/users/me", user_token)
+    ch = me["videoChannels"][0]["id"]
+    b = "----go" + _uuid.uuid4().hex
+    def field(n, v):
+        return (f"--{b}\r\nContent-Disposition: form-data; name=\"{n}\"\r\n\r\n{v}\r\n").encode()
+    body = b"".join([
+        field("name", (name or "Live from Teknakul Go")[:120]),
+        field("channelId", str(ch)),
+        field("privacy", "1"),          # public
+        field("permanentLive", "false"),
+        field("saveReplay", "false"),
+        field("latencyMode", "1"),
+    ]) + f"--{b}--\r\n".encode()
+    raw = _req(PT_URL + "/api/v1/videos/live", data=body,
+               headers={"Authorization": "Bearer " + user_token,
+                        "Content-Type": f"multipart/form-data; boundary={b}"}, method="POST")
+    vinfo = json.loads(raw)["video"]
+    live = pt_get(f"/api/v1/videos/live/{vinfo['uuid']}", user_token)
+    key = live["streamKey"]
+    return {
+        "videoUuid": vinfo["uuid"],
+        "shortUUID": vinfo.get("shortUUID"),
+        "streamKey": key,
+        "whipUrl": f"{GO_WHIP_HOST}/{key}/whip",
+        "watchUrl": f"{PUBLIC_APP}/w/{vinfo.get('shortUUID') or vinfo['uuid']}",
+    }
 
 # ------------------------------------------------------------------ entitlements
 def entitlement(username):
@@ -346,6 +381,14 @@ class H(BaseHTTPRequestHandler):
                 return self._json(503, {"error": "billing not configured"})
             try:
                 return self._json(200, {"url": billing.create_checkout(user, (body.get("plan") or "pro"))})
+            except Exception as e:  # noqa
+                return self._json(400, {"error": str(e)})
+        if u.path == "/go/start":
+            token = (self.headers.get("Authorization") or "").replace("Bearer ", "").strip()
+            try:
+                info = create_live(token, body.get("name"))
+                info["multistream"] = ent["max"] > 0  # will fan out if Pro
+                return self._json(200, info)
             except Exception as e:  # noqa
                 return self._json(400, {"error": str(e)})
         if u.path == "/destinations":

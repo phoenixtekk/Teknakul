@@ -1,0 +1,12 @@
+# Teknakul Go — MediaMTX WHIP->RTMP gateway. Host network so it can push to PeerTube's
+# RTMP on 127.0.0.1:1935 and bind the WebRTC UDP/HTTP ports directly.
+services:
+  mediamtx:
+    image: bluenviron/mediamtx:latest-ffmpeg
+    container_name: teknakul-go-gateway
+    restart: always
+    network_mode: host
+    volumes:
+      - ./mediamtx.yml:/mediamtx.yml:ro
+    cpus: 2.0
+    mem_limit: 1g
