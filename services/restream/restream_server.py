@@ -33,6 +33,11 @@ import urllib.request
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import urlparse, parse_qs
 
+try:
+    import billing            # Stripe checkout + webhook -> entitlements bridge
+except Exception:             # noqa - service still runs if billing config is absent
+    billing = None
+
 # ------------------------------------------------------------------ config
 PORT          = int(os.environ.get("RESTREAM_PORT", "3082"))
 HOST          = os.environ.get("RESTREAM_HOST", "127.0.0.1")
@@ -323,11 +328,26 @@ class H(BaseHTTPRequestHandler):
 
     def do_POST(self):
         u = urlparse(self.path)
+        # Stripe webhook: no user auth (signature-verified), needs the RAW body.
+        if u.path == "/billing/webhook":
+            if not billing:
+                return self._json(503, {"error": "billing not configured"})
+            n = int(self.headers.get("Content-Length", 0))
+            raw = self.rfile.read(n)
+            code, msg = billing.handle_webhook(raw, self.headers.get("Stripe-Signature", ""))
+            return self._json(code, {"ok": code == 200, "msg": msg})
         user = self._auth()
         if not user:
             return self._json(401, {"error": "sign in required"})
         ent = entitlement(user)
         body = self._body()
+        if u.path == "/billing/checkout":
+            if not billing:
+                return self._json(503, {"error": "billing not configured"})
+            try:
+                return self._json(200, {"url": billing.create_checkout(user, (body.get("plan") or "pro"))})
+            except Exception as e:  # noqa
+                return self._json(400, {"error": str(e)})
         if u.path == "/destinations":
             if ent["max"] <= 0:
                 return self._json(403, {"error": "Multistream is a Pro feature. Upgrade to add destinations."})

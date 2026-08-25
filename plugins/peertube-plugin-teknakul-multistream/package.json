@@ -1,6 +1,6 @@
 {
   "name": "peertube-plugin-teknakul-multistream",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Multistream — a Pro-gated page to manage restream destinations (Twitch/YouTube/Kick/custom) that Teknakul fans your live out to.",
   "engine": { "peertube": ">=6.0.0" },
   "keywords": [ "peertube", "plugin", "peertube-plugin" ],

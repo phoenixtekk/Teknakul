@@ -65,8 +65,21 @@ async function register ({ registerHook, registerClientRoute, peertubeHelpers })
     if (!state.max || state.max <= 0) {
       const up = el('div', { border: '1px solid rgba(62,189,248,.35)', borderRadius: '14px', padding: '22px', background: 'rgba(62,189,248,.06)' })
       up.appendChild(el('div', { fontWeight: '700', fontSize: '17px', marginBottom: '6px' }, 'Multistreaming is a Pro feature'))
-      up.appendChild(el('div', { color: 'var(--fg-350,#94a3b8)', marginBottom: '14px' }, 'Upgrade to Pro to broadcast to Twitch, YouTube, Kick and more at the same time — from your desk or your phone.'))
-      const a = el('a', { display: 'inline-block', padding: '10px 20px', borderRadius: '10px', background: SKY, color: '#0b1120', fontWeight: '700', textDecoration: 'none' }, 'See plans')
+      up.appendChild(el('div', { color: 'var(--fg-350,#94a3b8)', marginBottom: '16px' }, 'Broadcast to Twitch, YouTube, Kick and more at the same time — from your desk or your phone. Stream once, reach everywhere.'))
+      async function checkout (plan) {
+        try {
+          const d = await api('/billing/checkout', { method: 'POST', body: JSON.stringify({ plan }) })
+          if (d.url) window.location.href = d.url
+        } catch (e) { alert('Could not start checkout: ' + e.message) }
+      }
+      const btnRow = el('div', { display: 'flex', gap: '10px', flexWrap: 'wrap' })
+      const pro = el('button', { padding: '11px 20px', borderRadius: '10px', border: 'none', background: SKY, color: '#0b1120', fontWeight: '700', fontSize: '15px', cursor: 'pointer' }, 'Upgrade to Pro — $20/mo')
+      pro.addEventListener('click', () => checkout('pro'))
+      const studio = el('button', { padding: '11px 20px', borderRadius: '10px', border: '1px solid rgba(62,189,248,.4)', background: 'transparent', color: 'var(--fg,#e6edf5)', fontWeight: '700', fontSize: '15px', cursor: 'pointer' }, 'Go Studio — $49/mo')
+      studio.addEventListener('click', () => checkout('studio'))
+      btnRow.appendChild(pro); btnRow.appendChild(studio)
+      up.appendChild(btnRow)
+      const a = el('a', { display: 'inline-block', marginTop: '12px', color: SKY, textDecoration: 'none', fontSize: '13px' }, 'Compare all plans →')
       a.href = 'https://www.teknakul.com/pricing.html'
       up.appendChild(a); root.appendChild(up); return
     }

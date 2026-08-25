@@ -1,0 +1,11 @@
+{
+  "mode": "test",
+  "plans": {
+    "pro":    { "price": "price_1U8OtzCqoxpfJ3P8EkxQ1hdX", "max": 3 },
+    "studio": { "price": "price_1U8Ou8CqoxpfJ3P8Hu0PsPba", "max": 6 }
+  },
+  "addons": {
+    "network":      { "price": "price_1U8OuHCqoxpfJ3P8FpIxpL6i", "extra": 1 },
+    "network_pack": { "price": "price_1U8OuQCqoxpfJ3P8DHWRc0GD", "extra": 3 }
+  }
+}
