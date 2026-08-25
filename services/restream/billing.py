@@ -110,6 +110,9 @@ def create_checkout(username, plan):
         "success_url": PUBLIC_APP + "/p/multistream?upgraded=1",
         "cancel_url": MARKETING + "/pricing.html",
         "allow_promotion_codes": True,
+        # Account defaults to Managed Payments (needs product tax codes); disable per-session
+        # for now. Revisit when enabling Stripe Tax with proper product tax codes.
+        "managed_payments": {"enabled": False},
     })
     return session.get("url")
 
