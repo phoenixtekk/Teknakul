@@ -40,8 +40,9 @@ async function register ({ registerHook }) {
   }
 
   function findAnchor () {
-    return document.querySelector('#plugin-placeholder-player-next')
-      || document.querySelector('my-video-watch .video-info')
+    // Place the panel in the video-info column, directly under the player — not in the
+    // player-overlay placeholder (which floats it over the video).
+    return document.querySelector('my-video-watch .video-info')
       || document.querySelector('.video-info')
       || document.querySelector('my-video-watch')
   }
@@ -92,8 +93,8 @@ async function register ({ registerHook }) {
     row.appendChild(input); row.appendChild(btn)
     box.appendChild(title); box.appendChild(sub); box.appendChild(row); box.appendChild(out)
 
-    if (anchor.id === 'plugin-placeholder-player-next') anchor.appendChild(box)
-    else anchor.parentNode.insertBefore(box, anchor)
+    // top of the info column = directly beneath the video player
+    anchor.insertBefore(box, anchor.firstChild)
 
     async function ask () {
       const q = input.value.trim()
