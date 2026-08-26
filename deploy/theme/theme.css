@@ -95,6 +95,9 @@ body{background-color:transparent!important}
    object-fit could fix. Match the frame to the real 1920x317 aspect, then fill it. */
 .banner{padding-top:16.5104%!important}
 .banner img{object-fit:cover!important;object-position:center!important}
+/* The channel edit/create page caps the banner preview at 500px (looks tiny); show it
+   full width so it matches how the banner actually appears on the channel page. */
+my-actor-banner-edit{max-width:100%!important}
 
 /* ============================================================
    Left-nav polish (Rumble-like), indigo accents
