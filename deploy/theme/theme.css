@@ -90,14 +90,13 @@ html[data-pt-theme=peertube-core-dark-brown] .tk-star{background:radial-gradient
 html{background-color:var(--bg)!important}
 body{background-color:transparent!important}
 
-/* Channel/account banners: PeerTube stores them at exactly 1920x317 (6.057:1) but its
-   display frame is padding-top:16.667% (6:1). That 3px mismatch forced a stretch/gap no
-   object-fit could fix. Match the frame to the real 1920x317 aspect, then fill it. */
-.banner{padding-top:16.5104%!important}
-.banner img{object-fit:cover!important;object-position:center!important}
-/* The channel edit/create page caps the banner preview at 500px (looks tiny); show it
-   full width so it matches how the banner actually appears on the channel page. */
-my-actor-banner-edit{max-width:100%!important}
+/* Channel/account banners: PeerTube locks the banner into an aspect box and stretches the
+   image to fill it (squishing tall art). Instead, let the banner size to the image's TRUE
+   aspect ratio — the height follows the image, so it can never be distorted. */
+.banner{padding-top:0!important;height:auto!important}
+.banner img{position:static!important;width:100%!important;height:auto!important;display:block}
+/* Cap the channel edit/create preview at a sensible width. */
+my-actor-banner-edit{max-width:600px!important}
 
 /* ============================================================
    Left-nav polish (Rumble-like), indigo accents
