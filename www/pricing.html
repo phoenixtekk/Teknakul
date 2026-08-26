@@ -28,7 +28,7 @@
   header{position:sticky;top:0;z-index:50;backdrop-filter:blur(12px);background:rgba(255,255,255,.72);border-bottom:1px solid var(--line)}
   nav{display:flex;align-items:center;justify-content:space-between;height:66px}
   .brand{display:flex;align-items:center;gap:11px;font-weight:800;font-size:20px}
-  .brand svg{width:34px;height:34px;border-radius:9px;display:block}
+  .brand svg,.brand img{width:34px;height:34px;border-radius:9px;display:block;object-fit:contain}
   .navlinks{display:flex;gap:28px;align-items:center;font-size:15px;color:var(--slate)}
   .navlinks a:hover{color:var(--ink)}
   .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:11px 20px;border-radius:11px;font-weight:600;font-size:15px;transition:.18s;border:1px solid transparent;white-space:nowrap;cursor:pointer}
@@ -97,7 +97,7 @@
 
 <header><div class="wrap"><nav>
   <a class="brand" href="/">
-    <svg viewBox="0 0 512 512" aria-hidden="true"><rect width="512" height="512" rx="116" fill="#0f172a"/><rect x="132" y="150" width="248" height="58" rx="16" fill="#3ebdf8"/><rect x="227" y="150" width="58" height="212" rx="16" fill="#3ebdf8"/><path d="M256 300 L322 366 L300 388 L256 344 L212 388 L190 366 Z" fill="#38bdf8"/></svg>
+    <img src="/teknakul-logo.png" alt="Teknakul" aria-hidden="true">
     TEKNAKUL
   </a>
   <div class="navlinks">
