@@ -91,8 +91,9 @@ html{background-color:var(--bg)!important}
 body{background-color:transparent!important}
 
 /* Channel/account banners: PeerTube omits object-fit so banners get stretched to fill
-   (distorted). Scale-to-cover preserves the aspect ratio (fills, crops overflow only). */
-.banner img{object-fit:cover!important;object-position:center!important}
+   (distorted). object-fit:contain shows the WHOLE banner, aspect preserved, zero crop
+   (may letterbox slightly if the aspect isn't exactly 6:1). */
+.banner img{object-fit:contain!important;object-position:center!important}
 
 /* ============================================================
    Left-nav polish (Rumble-like), indigo accents
