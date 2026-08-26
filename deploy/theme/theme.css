@@ -95,8 +95,16 @@ body{background-color:transparent!important}
    aspect ratio — the height follows the image, so it can never be distorted. */
 .banner{padding-top:0!important;height:auto!important}
 .banner img{position:static!important;width:100%!important;height:auto!important;display:block}
-/* Cap the channel edit/create preview at a sensible width. */
+/* Cap the channel edit/create preview at a sensible width. The create/edit preview image is
+   `.banner-placeholder img` (NOT `.banner img`) — PeerTube's block-ratio mixin locks it in a
+   fixed 6:1 box at width:100%;height:100% with NO object-fit, so the browser default `fill`
+   STRETCHES the image (the "smashed" look). Unlock the box and let the image keep its true
+   aspect ratio, exactly like the public channel page above. */
 my-actor-banner-edit{max-width:600px!important}
+my-actor-banner-edit .banner-placeholder,
+.banner-placeholder{padding-top:0!important;height:auto!important}
+my-actor-banner-edit .banner-placeholder img,
+.banner-placeholder img{position:static!important;width:100%!important;height:auto!important;display:block!important}
 
 /* ============================================================
    Left-nav polish (Rumble-like), indigo accents
