@@ -90,6 +90,10 @@ html[data-pt-theme=peertube-core-dark-brown] .tk-star{background:radial-gradient
 html{background-color:var(--bg)!important}
 body{background-color:transparent!important}
 
+/* Channel/account banners: PeerTube omits object-fit so banners get stretched to fill
+   (distorted). Scale-to-cover preserves the aspect ratio (fills, crops overflow only). */
+.banner img{object-fit:cover!important;object-position:center!important}
+
 /* ============================================================
    Left-nav polish (Rumble-like), indigo accents
    ============================================================ */
