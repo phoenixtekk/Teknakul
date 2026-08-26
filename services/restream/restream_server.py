@@ -38,6 +38,11 @@ try:
 except Exception:             # noqa - service still runs if billing config is absent
     billing = None
 
+try:
+    import chat               # unified Twitch + YouTube chat
+except Exception:             # noqa
+    chat = None
+
 # ------------------------------------------------------------------ config
 PORT          = int(os.environ.get("RESTREAM_PORT", "3082"))
 HOST          = os.environ.get("RESTREAM_HOST", "127.0.0.1")
@@ -346,10 +351,26 @@ class H(BaseHTTPRequestHandler):
         except (ValueError, json.JSONDecodeError):
             return {}
 
+    def _redirect(self, url):
+        self.send_response(302)
+        self._cors()
+        self.send_header("Location", url)
+        self.send_header("Content-Length", "0")
+        self.end_headers()
+
     def do_GET(self):
         u = urlparse(self.path)
+        q = parse_qs(u.query)
         if u.path == "/health":
             return self._json(200, {"ok": True})
+        # OAuth callbacks are public (the signed state carries the user).
+        if chat and u.path in ("/oauth/twitch/callback", "/oauth/youtube/callback"):
+            plat = "twitch" if "twitch" in u.path else "youtube"
+            try:
+                uname, err = chat.handle_callback(plat, (q.get("code") or [""])[0], (q.get("state") or [""])[0])
+            except Exception as e:  # noqa
+                uname, err = None, str(e)
+            return self._redirect(PUBLIC_APP + "/p/chat?" + ("connected=" + plat if uname else "error=1"))
         user = self._auth()
         if not user:
             return self._json(401, {"error": "sign in required"})
@@ -359,6 +380,11 @@ class H(BaseHTTPRequestHandler):
                                     "destinations": list_dests(user)})
         if u.path == "/status":
             return self._json(200, {"plan": ent["plan"], **running_status(user)})
+        if chat and u.path == "/chat/poll":
+            after = int((q.get("after") or ["0"])[0] or 0)
+            return self._json(200, chat.poll(user, after))
+        if chat and u.path == "/chat/status":
+            return self._json(200, chat.status(user))
         self._json(404, {"error": "not found"})
 
     def do_POST(self):
@@ -391,6 +417,15 @@ class H(BaseHTTPRequestHandler):
                 return self._json(200, info)
             except Exception as e:  # noqa
                 return self._json(400, {"error": str(e)})
+        if chat and u.path in ("/oauth/twitch/start", "/oauth/youtube/start"):
+            plat = "twitch" if "twitch" in u.path else "youtube"
+            return self._json(200, {"url": chat.authorize_url(plat, user)})
+        if chat and u.path == "/chat/send":
+            ok = chat.send(user, body.get("platform"), (body.get("text") or "")[:400])
+            return self._json(200 if ok else 400, {"ok": ok})
+        if chat and u.path == "/chat/disconnect":
+            chat.disconnect(user, body.get("platform"))
+            return self._json(200, {"ok": True})
         if u.path == "/destinations":
             if ent["max"] <= 0:
                 return self._json(403, {"error": "Multistream is a Pro feature. Upgrade to add destinations."})

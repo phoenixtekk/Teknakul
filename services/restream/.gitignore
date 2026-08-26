@@ -1,4 +1,6 @@
 restream.db
 .secret
+.env
 entitlements.json
+chat_connections.json
 *.log

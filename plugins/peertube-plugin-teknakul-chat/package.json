@@ -1,0 +1,15 @@
+{
+  "name": "peertube-plugin-teknakul-chat",
+  "version": "1.0.0",
+  "description": "Unified chat — read and reply to your Twitch + YouTube live chat in one place while you multistream.",
+  "engine": { "peertube": ">=6.0.0" },
+  "keywords": [ "peertube", "plugin", "peertube-plugin" ],
+  "homepage": "https://teknakul.com",
+  "author": "Teknakul",
+  "bugs": "https://teknakul.com",
+  "library": "./main.js",
+  "staticDirs": {},
+  "css": [],
+  "clientScripts": [ { "script": "client/chat.js", "scopes": [ "common" ] } ],
+  "translations": {}
+}
